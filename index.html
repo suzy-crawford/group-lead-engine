@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Build your own Facebook group lead engine in Base44: 12 copy-and-paste prompts.">
+<title>Group Lead Engine build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Inter:wght@400;600;700&display=swap">
+<style>
+/* Freelancer To CEO look: navy-black ground, cream Gloock headings, coral-to-violet gradient on a few words, coral pill buttons. One column. */
+:root {
+  --bg: #0B0D14;
+  --panel: #13161F;
+  --panel-2: #1A1E29;
+  --line: rgba(246, 243, 238, 0.10);
+  --cream: #F6F3EE;
+  --muted: rgba(246, 243, 238, 0.68);
+  --faint: rgba(246, 243, 238, 0.45);
+  --coral: #FF7763;
+  --coral-press: #EC6450;
+  --grad: linear-gradient(90deg, #FF7A59, #FF5FA2 35%, #C86BFA 65%, #7C8CFF);
+  --display: "Gloock", Georgia, "Times New Roman", serif;
+  --body: "Inter", -apple-system, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: radial-gradient(900px 500px at 50% -120px, #1C1F2B 0%, var(--bg) 70%) no-repeat, var(--bg);
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.4rem, 8vw, 3.6rem); line-height: 1.02; letter-spacing: -0.03em; }
+h2 { font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.01em; }
+h3 { font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; }
+p { margin: 0; }
+.grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wordmark { font-family: var(--display); font-size: 1.25rem; letter-spacing: -0.01em; }
+.badge { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 7px 14px; border-radius: 999px; background: rgba(200, 107, 250, 0.16); color: #E2C9FF; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; padding-top: 12px; }
+.label { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+.hero .label { color: #E2C9FF; }
+.lede { color: var(--muted); font-size: 1.06rem; max-width: 58ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-size: 13px; font-weight: 600; padding: 7px 13px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); color: var(--cream); }
+
+.card, .step { --panel: #FDFBF8; --panel-2: #F3EEE6; --line: #E7E0D4; --cream: #1A2236; --muted: #5B6172; --faint: #8A8F9E; color: var(--cream); color-scheme: light; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 14px; }
+.card.glow { border: 1px solid transparent; background: linear-gradient(var(--panel), var(--panel)) padding-box, var(--grad) border-box; }
+.card ol, .card ul { margin: 0; padding-left: 1.25em; display: grid; gap: 8px; color: var(--muted); }
+.card li strong, .card p strong { color: var(--cream); font-weight: 600; }
+.muted { color: var(--muted); }
+.ticks { list-style: none; padding: 0 !important; }
+.ticks li { display: grid; grid-template-columns: 22px 1fr; gap: 12px; color: var(--cream) !important; }
+.ticks li::before { content: "✓"; width: 22px; height: 22px; border-radius: 999px; background: var(--grad); color: var(--bg); font-size: 12px; font-weight: 700; display: grid; place-items: center; margin-top: 2px; }
+code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9em; background: var(--panel-2); color: var(--cream); padding: 2px 6px; border-radius: 6px; }
+
+.btn {
+  font: 700 15px/1 var(--body); letter-spacing: 0.02em; border: 0; border-radius: 999px;
+  padding: 0 24px; min-height: 48px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--coral); color: #FFFFFF; text-decoration: none;
+}
+.btn:active { background: var(--coral-press); }
+.btn.copied { background: var(--coral-press); }
+.btn:focus-visible, .link-btn:focus-visible, .done:focus-within { outline: 2px solid #C86BFA; outline-offset: 3px; }
+.link-btn { background: none; border: 0; color: var(--muted); font: 600 15px var(--body); cursor: pointer; padding: 12px 4px; text-decoration: underline; text-underline-offset: 3px; }
+.link-btn:hover { color: var(--cream); }
+
+.steps-head { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.step { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.step.is-done { border-color: rgba(200, 107, 250, 0.55); }
+.step-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.done { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); padding: 6px 12px 6px 8px; border-radius: 999px; border: 1px solid var(--line); min-height: 36px; }
+.done input { width: 18px; height: 18px; margin: 0; accent-color: #C86BFA; }
+.step.is-done .done { color: var(--cream); background: rgba(200, 107, 250, 0.16); border-color: transparent; }
+.desc { color: var(--muted); }
+.prompt-wrap { position: relative; background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; max-height: 150px; overflow: hidden; }
+.prompt-wrap.open { max-height: none; }
+.prompt-wrap:not(.open)::after { content: ""; position: absolute; inset: auto 0 0 0; height: 70px; background: linear-gradient(to bottom, rgba(243, 238, 230, 0), var(--panel-2)); pointer-events: none; }
+.prompt { margin: 0; padding: 16px 18px; font: 14px/1.55 var(--body); color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+
+.stuck { display: grid; gap: 14px; }
+.stuck p { color: var(--muted); }
+.stuck strong { color: var(--cream); font-weight: 600; display: block; margin-bottom: 2px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 16px); background: var(--cream); color: var(--bg); font-weight: 600; font-size: 14px; padding: 12px 18px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); text-align: center; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 560px) { .card, .step { padding: 20px; } .actions .btn { flex: 1 1 100%; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <span class="wordmark">Freelancer To <span class="grad">CEO</span></span>
+    <span class="badge">Build guide</span>
+  </div>
+
+  <section class="hero">
+    <h1>Your Facebook group <span class="grad">lead engine</span></h1>
+    <p class="lede">An app that finds your 20 busiest Facebook groups, writes a 6-week posting plan for each one, and tracks which posts bring in leads.</p>
+    <div class="chips">
+      <span class="chip">Build in: Base44 · new app · Build mode</span>
+      <span class="chip">About 90 min</span>
+      <span class="chip">12 steps</span>
+    </div>
+  </section>
+
+  <div class="card glow">
+    <h2>What you'll walk away with</h2>
+    <ul class="ticks">
+      <li>Your 20 most active groups: 10 in your niche, 10 local</li>
+      <li>A 6-week posting plan, written for every group</li>
+      <li>A Copy &amp; open group button for posting in seconds</li>
+      <li>A tracker that shows which posts bring in leads</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Before you start</h2>
+    <ol>
+      <li>Sign up at <strong>apify.com</strong>. It's what searches Facebook. A full search costs about $0.40–$1.50 of credit.</li>
+      <li>In Apify, go to Settings → API &amp; Integrations and copy your <strong>Personal API token</strong>.</li>
+      <li>In your new Base44 app, switch on <strong>backend functions</strong>, then add a secret named <code>APIFY_TOKEN</code> and paste your token in.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Where to paste it</h2>
+    <ol>
+      <li>Open Base44 and go to your home dashboard.</li>
+      <li>Start a <strong>new app</strong> (not the Agent tab).</li>
+      <li>Check the chat is on <strong>Build</strong> mode, not Discuss.</li>
+      <li>Paste Step 1 as one message and send it. Wait until it finishes.</li>
+    </ol>
+    <p class="muted"><strong>Then:</strong> paste the next step into the same app's chat. Never start a new app between steps. One step at a time, and let each step finish before the next.</p>
+    <div><a class="btn" href="https://base44.com" target="_blank" rel="noopener">Open Base44 ↗</a></div>
+  </div>
+
+  <div class="steps-head">
+    <h2>Your 12 steps</h2>
+    <p class="muted">Tap copy, paste into Base44, send. Tick each step when it's done.</p>
+  </div>
+
+  
+    <article class="step" id="step-1">
+      <div class="step-top">
+        <span class="label">Step 1 of 12</span>
+        <label class="done" for="done-1"><input type="checkbox" id="done-1" data-step="1"><span>Done</span></label>
+      </div>
+      <h3>The app, data and pages</h3>
+      <p class="desc">Creates the app, its seven pages and the data it needs.</p>
+      <div class="prompt-wrap" id="wrap-1">
+        <pre class="prompt" id="prompt-1">Build an app called &quot;Group Lead Engine&quot; for me, a freelance marketer. It finds the 20 most active Facebook groups where my ideal clients spend time, then gives me a weekly posting sequence (6 weeks, then it repeats) with the post for each group written for me. I always post by hand. The app must never post to Facebook, log in to Facebook, or ask for Facebook passwords.
+
+This app is just for me. Keep it simple: no user roles, sign-up flows or extra security rules. My posts use the spelling I choose in Setup (UK or US).
+
+Create these entities:
+
+1. Profile (just one record: mine)
+- first_name (text)
+- business_name (text)
+- business_description (text): how I describe my business in a post, e.g. &quot;social media management agency&quot; or &quot;Meta ads business&quot;
+- service (text): what I do, e.g. &quot;I run Meta ads for clinics&quot;
+- ideal_client (text): type of business, size, and what they struggle with
+- not_ideal_client (text, optional)
+- client_interests (text): what my ideal clients are into outside work
+- other_hangouts (text): other places my ideal clients spend time
+- country (select: United Kingdom, United States, Other)
+- town (text)
+- region (text): county (UK), state (US) or region
+- client_reach (select: Local only, Anywhere in my country, Worldwide)
+- groups_to_avoid (long text, optional)
+- client_result (long text, optional): a real client result
+- client_result_2 (long text, optional): a second, different real client result
+- spelling (select: UK, US)
+- currency (select: GBP, USD, EUR, AUD, CAD, Other)
+- sequence_start_date (date): the Monday I start week 1
+- setup_complete (boolean)
+
+2. Search
+- status (select: Keywords ready, Waiting, Searching, Checking groups, Done, Failed)
+- keywords (JSON array of objects: keyword, type [&quot;Niche&quot; or &quot;Local&quot;], run_id, dataset_id, run_status [&quot;queued&quot;, &quot;running&quot;, &quot;done&quot;, &quot;failed&quot;], cost_usd, groups_found, error)
+- total_cost_usd (number)
+- summary (long text): plain-English notes, e.g. &quot;Only 6 UK niche groups reached 10 posts a day&quot;
+- started_at (date-time)
+
+3. Group
+- search_id, fb_group_id, name, url, privacy (text), members, posts_last_30_days, posts_last_24_hours (numbers), description, rules (long text), search_keyword (text), keyword_type (select: Niche, Local), type (select: Niche, Local - business, Local - community), included (boolean), rank (number), why_it_fits (text), posting_rules (text), allows_lead_post (boolean), drop_reason (text), status (select: Not joined, Requested, Joined, Left, Not a fit; default &quot;Not joined&quot;), notes (long text)
+
+4. Template (my editable posting sequence)
+- week_number (number, 1 up), title, purpose (text), body (long text), community_version (long text, optional), needs_client_result (boolean), when_to_post (text, optional)
+
+5. Post
+- group_id (text), week_number (number, absolute week from sequence_start_date), round (number), template_week (number), body (long text), status (select: To post, Posted, Skipped; default &quot;To post&quot;), posted_at (date-time), needs_result_filled (boolean), comments_count (number), notes (long text)
+
+Pages, with a left-hand sidebar menu on desktop and a bottom tab bar on mobile:
+- &quot;Home&quot;: how the app works and my next step (built in the next prompt)
+- &quot;Setup&quot;: my profile
+- &quot;Find groups&quot;
+- &quot;My groups&quot;
+- &quot;Templates&quot;
+- &quot;Post this week&quot;
+- &quot;Tracker&quot;
+
+It must work well on a phone, with large tap targets, because I&#x27;ll mostly post from my phone. Just build the pages and data for now. I&#x27;ll give you the look and feel in the next prompt, then describe each page.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-1" data-target="prompt-1">Copy step 1</button>
+        <button type="button" class="link-btn more" id="more-1" data-target="wrap-1" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-2">
+      <div class="step-top">
+        <span class="label">Step 2 of 12</span>
+        <label class="done" for="done-2"><input type="checkbox" id="done-2" data-step="2"><span>Done</span></label>
+      </div>
+      <h3>Look and feel</h3>
+      <p class="desc">Gives the whole app its look before any pages are built.</p>
+      <div class="prompt-wrap" id="wrap-2">
+        <pre class="prompt" id="prompt-2">Apply this design system to the whole app now, and use it for every page I ask you to build after this. Keep all existing features, data and wording; this prompt only sets the look.
+
+FEEL
+Warm, editorial and premium. Think a good magazine, not a tech dashboard. Cream and black only: cream is the base, black is the anchor. Calm, lots of space, nothing flashy.
+
+COLOURS (cream and black only; no other colours anywhere)
+- Page background: cream #F7F2E8
+- Cards, inputs and panels: light cream #FCF9F3 with a 1px border #E4DCCB
+- Alternating sections, table header rows and tags: deeper cream #EFE8DA
+- Main text and headings: black #141210
+- Secondary text, labels and dates: warm grey #6E675C
+- Primary buttons: black #141210 with cream text #F7F2E8; pressed state #2B2824
+- Secondary buttons: transparent with a 1px #141210 border and black text
+- Links: black, underlined
+- Icons and list numbers: black
+- Tip and callout panels: deeper cream #EFE8DA with a 3px black left border and black text
+- Sidebar: black #141210 with cream text #F7F2E8, muted text #A39E93, hover and active item #24211D, dividers #2E2B26
+- Status (done, warning, error): never use colour to show status. Use a short word plus a simple icon, e.g. a black &quot;Posted&quot; tag with a tick, or &quot;Needs a result&quot; in a callout panel.
+
+TYPOGRAPHY
+- Headings: Gloock (Google Fonts), regular weight 400, never bold. Page titles about 48–52px, section titles about 28px, with slightly tight letter spacing.
+- Everything else: Inter, 400 for body, 600 for labels and buttons. Body 15–16px, line height 1.5.
+- Small section labels: Inter 12px, uppercase, letter spacing 0.15em, colour #6E675C, with a short 40px x 2px black line before them.
+- Sentence case for every heading, button and menu item.
+
+SHAPE AND SPACING
+- Corner radius: 12px on cards and panels, 8px on buttons and inputs, full pill only on small tags.
+- Flat design: hairline borders instead of heavy shadows. Only menus and modals get a soft shadow.
+- Generous spacing: 24–32px padding inside cards, 48–64px between sections.
+- One clear primary button per screen.
+
+LAYOUT
+- Black sidebar on the left with cream text, the app name in Gloock at the top, and the active item on #24211D.
+- Main area on cream with a big Gloock greeting, a one-line next step between hairlines, then black tool cards with cream text and simple cream line icons.
+- Tables and lists use hairline rows (#E4DCCB), a light header row on #EFE8DA, and no zebra stripes.
+
+DON&#x27;T
+- No colours other than the creams, blacks and warm greys above: no purple, blue, green, red, pink or gradients.
+- No pure white (#FFFFFF) or pure black (#000000) backgrounds.
+- No logos or brand names other than the app&#x27;s name.
+- No glows, glassy blurred panels, sparkles or emoji in the interface.
+- No bold Gloock and no all-caps headings.
+
+HOW THIS APPLIES TO THIS APP
+- Show &quot;Group Lead Engine&quot; as the app&#x27;s name in the sidebar and the browser tab.
+- The Home page uses the greeting layout: &quot;Good morning / afternoon / evening, [first name].&quot; by the time of day, the next step between hairlines, then black tool cards for Find groups, My groups, Post this week and Tracker.
+- On phones (under 768px wide), the black sidebar becomes a black bottom tab bar with cream icons and labels, active item on #24211D. Page titles shrink to about 34–36px, and card padding to 20px. Keep 16px side margins and no sideways scrolling.
+- The no-emoji rule is for the app&#x27;s interface only. The text of Facebook posts keeps its emojis exactly as written.
+- When I ask for a warning or highlight, use the callout panel with a short label. When I ask for something to show as done, use a black tag with a tick and a word, e.g. &quot;Posted&quot;.
+- On pages where every card has the same main action (e.g. &quot;Copy &amp; open group&quot; on Post this week), that repeated button can be the black primary button on each card. Everything else on those cards is secondary.
+- Charts on the Tracker: bars in black #141210, planned lines dashed in #6E675C, hairline gridlines #E4DCCB, numbers in Inter.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-2" data-target="prompt-2">Copy step 2</button>
+        <button type="button" class="link-btn more" id="more-2" data-target="wrap-2" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-3">
+      <div class="step-top">
+        <span class="label">Step 3 of 12</span>
+        <label class="done" for="done-3"><input type="checkbox" id="done-3" data-step="3"><span>Done</span></label>
+      </div>
+      <h3>Home and Setup</h3>
+      <p class="desc">Adds your home screen and the form about your ideal client and where you're based.</p>
+      <div class="prompt-wrap" id="wrap-3">
+        <pre class="prompt" id="prompt-3">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+HOME PAGE
+If the user&#x27;s Profile doesn&#x27;t exist or setup_complete is false, send them to Setup first. Otherwise show:
+- A short welcome: &quot;Find the Facebook groups your ideal clients hang out in, get a 6-week posting plan written for you, and track which posts bring in leads.&quot;
+- A small line: &quot;Searches this month: N (about $X of Apify credit)&quot;, from this month&#x27;s Searches.
+- Four steps with a tick when done: 1 Set up your profile, 2 Find your groups, 3 Join your groups, 4 Post each week.
+- A big button for the next step they haven&#x27;t done.
+- &quot;How to get leads from groups&quot;, as short tips: post only when you have time to reply to every comment; reply publicly with a genuinely useful answer and one follow-up question; when someone DMs, reply the same day; never paste prices or links into posts; comment helpfully on 3–5 posts a day between your own posts.
+- &quot;This app never posts for you. You stay in control of your Facebook account.&quot;
+
+SETUP PAGE
+A short step-by-step form (one step per screen on mobile) that saves to the user&#x27;s Profile. If a Profile exists, load it so they can edit it.
+
+1. &quot;About you&quot;: first_name, business_name, business_description (&quot;How would you describe your business in a sentence like &#x27;I own a ___&#x27;?&quot;, e.g. &quot;social media management agency&quot;).
+2. &quot;What do you do?&quot;: service. Placeholder: &quot;I run Meta ads for clinics&quot;.
+3. &quot;Who&#x27;s your ideal client?&quot;: ideal_client, plus not_ideal_client (&quot;Anyone you don&#x27;t want? e.g. chains, franchises&quot;).
+4. &quot;What are they into?&quot;: client_interests (&quot;Outside work, what are your ideal clients interested in?&quot;) and other_hangouts (&quot;Where else do they hang out online or locally?&quot;).
+5. &quot;Where are you based?&quot;: country first. Then:
+   - United Kingdom: &quot;Your town&quot; and &quot;Your county&quot; (e.g. Bracknell, Berkshire). Set spelling UK and currency GBP.
+   - United States: &quot;Your city&quot; and &quot;Your state&quot; (e.g. Austin, Texas). Set spelling US and currency USD.
+   - Other: &quot;Your city or town&quot; and &quot;Region, province or state&quot;, plus spelling and currency.
+6. &quot;Where are your clients?&quot;: client_reach.
+7. &quot;Anything to avoid?&quot;: groups_to_avoid (optional).
+8. &quot;Client results you&#x27;re proud of&quot;: client_result and client_result_2 (both optional). Ask what changed, by how much, how fast, and what they did. Helper text: &quot;Only real results with real numbers. Two posts in the sequence share a client win, so two different results are best. We&#x27;ll never make one up.&quot;
+9. &quot;When do you want to start posting?&quot;: sequence_start_date, defaulting to next Monday.
+
+If the ideal client is very broad (e.g. &quot;any small business&quot;), show a gentle note: &quot;Groups and posts work much better with one niche. Could you pick one?&quot;. Let them carry on anyway.
+
+On the last step set setup_complete = true and show a button &quot;Find my groups&quot;.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-3" data-target="prompt-3">Copy step 3</button>
+        <button type="button" class="link-btn more" id="more-3" data-target="wrap-3" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-4">
+      <div class="step-top">
+        <span class="label">Step 4 of 12</span>
+        <label class="done" for="done-4"><input type="checkbox" id="done-4" data-step="4"><span>Done</span></label>
+      </div>
+      <h3>Keyword generation</h3>
+      <p class="desc">Adds an AI button that suggests the words your ideal clients search for.</p>
+      <div class="prompt-wrap" id="wrap-4">
+        <pre class="prompt" id="prompt-4">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+On the Find groups page, add a button &quot;Suggest search keywords&quot;. Under it, show: &quot;A full search uses about $0.40–$1.50 of your Apify credit and takes 20–30 minutes.&quot;
+
+The button reads the user&#x27;s Profile and uses the AI (InvokeLLM with a JSON schema) to suggest keywords, then shows them as editable chips in two lists, &quot;Niche&quot; and &quot;Local&quot;. The user can delete, edit or add chips, up to 16 in total, then press &quot;Start search&quot;. Pressing it creates a Search record with status &quot;Keywords ready&quot; and each keyword saved with run_status &quot;queued&quot;.
+
+Give the AI these rules exactly:
+
+KEYWORD RULES
+- Every keyword is 2–3 words. The search only keeps groups whose name or description contains EVERY word, so longer phrases return nothing.
+- NICHE keywords (5–6):
+  - Use the words the ideal client calls THEMSELVES, not words for what the marketer sells. E.g. for an ads manager for clinics: &quot;clinic owners UK&quot;, &quot;aesthetics business&quot;, &quot;med spa owners&quot;.
+  - Use &quot;owners&quot; or the job title owners use for themselves, not broad industry words. &quot;Hospitality&quot; and &quot;catering&quot; return jobs and equipment groups. For beauty, role words work best: &quot;nail techs UK&quot;, &quot;lash techs UK&quot;, &quot;aesthetic practitioners UK&quot;, &quot;hairdressers UK&quot;.
+  - If client_reach is &quot;Anywhere in my country&quot;, add the country, e.g. &quot;restaurant owners UK&quot;. Without it, results come back from the Philippines, Dubai and India.
+  - Use client_interests and other_hangouts to add 1–2 keywords for where these owners actually spend time.
+  - Avoid ambiguous single words (&quot;injectors&quot; returned diesel fuel-injector groups).
+- LOCAL keywords (6–8), a mix of business and community:
+  - Business: &quot;&lt;town&gt; business&quot;, &quot;&lt;town&gt; small business&quot;, &quot;&lt;town&gt; networking&quot;, &quot;&lt;region&gt; business&quot;.
+  - Community: &quot;&lt;town&gt; mums&quot; (UK) or &quot;&lt;town&gt; moms&quot; (US), &quot;&lt;town&gt; parents&quot;, &quot;&lt;town&gt; community&quot;, &quot;&lt;town&gt; chat&quot;, &quot;&lt;neighbouring town&gt; community&quot;.
+  - Add 1–2 local keywords from client_interests if they fit, e.g. &quot;&lt;town&gt; runners&quot;.
+  - Include 1–2 neighbouring towns within about 30 minutes.
+  - US: many towns share names, so also use the state, e.g. &quot;Texas small business&quot;.
+  - If the town is also an everyday word (Reading, Bath, Deal, March, Wells, Street, Ware, Sale), add the county (&quot;Reading Berkshire&quot;) or use a neighbouring town instead.
+- Never suggest keywords that would find groups for marketers, advertising, jobs or buy/sell.
+
+Return JSON: { &quot;niche&quot;: [string], &quot;local&quot;: [string], &quot;notes&quot;: string }. Show the notes above the chips.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-4" data-target="prompt-4">Copy step 4</button>
+        <button type="button" class="link-btn more" id="more-4" data-target="wrap-4" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-5">
+      <div class="step-top">
+        <span class="label">Step 5 of 12</span>
+        <label class="done" for="done-5"><input type="checkbox" id="done-5" data-step="5"><span>Done</span></label>
+      </div>
+      <h3>Apify search</h3>
+      <p class="desc">Connects the app to Apify so it can find Facebook groups. Try one keyword first.</p>
+      <div class="prompt-wrap" id="wrap-5">
+        <pre class="prompt" id="prompt-5">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+Create two backend functions that call Apify. My Apify token is in the secret APIFY_TOKEN. Never send it to the browser or include it in any response.
+
+Use the Apify actor &quot;memo23/facebook-search-groups-scraper&quot; (in API URLs: memo23~facebook-search-groups-scraper). Runs take 2–4 minutes, so never wait for a run inside a function: start runs, save their IDs, and let the page check back.
+
+SHARED HELPER: freeSlots()
+- Ask Apify how many runs are running on my account right now:
+  GET https://api.apify.com/v2/actor-runs?status=RUNNING&amp;limit=100 (header Authorization: Bearer &lt;APIFY_TOKEN&gt;)
+- Return 5 minus that count, never below 0. (Apify&#x27;s free plan allows 5 runs at once. This also counts runs I&#x27;ve started elsewhere in Apify.)
+
+SHARED HELPER: startQueued(search)
+- While freeSlots() &gt; 0 and the Search has keywords with run_status &quot;queued&quot;, start the next one:
+  POST https://api.apify.com/v2/acts/memo23~facebook-search-groups-scraper/runs?memory=1024&amp;maxTotalChargeUsd=0.3
+  Header: Authorization: Bearer &lt;APIFY_TOKEN&gt;
+  JSON body: {&quot;searchQueries&quot;: [&quot;&lt;the one keyword&gt;&quot;], &quot;maxGroups&quot;: 50, &quot;requireKeywordMatch&quot;: true, &quot;privacy&quot;: &quot;any&quot;, &quot;minMembers&quot;: 1000}
+- Save run_id = data.id, dataset_id = data.defaultDatasetId, run_status = &quot;running&quot;.
+- If a start request fails or times out, mark that keyword &quot;failed&quot; with the error, and DON&#x27;T retry it automatically (it may have started anyway, and a retry could charge twice).
+- Search status: &quot;Searching&quot; if any keyword is running, otherwise &quot;Waiting&quot;.
+
+FUNCTION 1: startGroupSearch({ searchId })
+- The Search must have no more than 16 keywords.
+- Set started_at = now, then run startQueued.
+
+FUNCTION 2: checkGroupSearch({ searchId })
+- For every keyword with run_status &quot;running&quot;:
+  GET https://api.apify.com/v2/actor-runs/&lt;run_id&gt; (same auth header)
+  - If data.status is SUCCEEDED, fetch
+    GET https://api.apify.com/v2/datasets/&lt;dataset_id&gt;/items?clean=true&amp;fields=name,url,groupId,privacy,membersCount,postsLastDay,postsLastMonth,description,groupDescription,rules,searchQuery
+    For each item, fb_group_id = item.groupId; if that&#x27;s empty, use the part of item.url after /groups/, without slashes or query string. Skip it if this Search already has a Group with that fb_group_id (the same group can come back as www.facebook.com and web.facebook.com). Otherwise create a Group: name, url = https://www.facebook.com/groups/&lt;fb_group_id&gt;, privacy, members = membersCount, posts_last_30_days = postsLastMonth, posts_last_24_hours = postsLastDay, description = item.description or item.groupDescription, rules (a list of { title, description }: join each into &quot;Title: description&quot; lines), search_keyword, keyword_type, included = false, status &quot;Not joined&quot;.
+    Save groups_found, cost_usd = data.usageTotalUsd, run_status &quot;done&quot;.
+  - If data.status is FAILED, TIMED-OUT or ABORTED: run_status &quot;failed&quot;, and save a short error. If the run stopped at about $0.01 with a &quot;maximum cost per run&quot; message, my Apify account is out of credit: stop starting new runs, set the Search status to &quot;Failed&quot;, and set the summary to &quot;Your Apify account is out of credit. Top up at apify.com under Billing, then press Resume search.&quot; Add a &quot;Resume search&quot; button that sets those failed keywords back to &quot;queued&quot; and calls startGroupSearch.
+  - If Apify returns 401, set the summary to &quot;Apify didn&#x27;t accept your token. Check the APIFY_TOKEN secret in your Base44 settings.&quot;
+- Then call startQueued(search) to use any free slots.
+- total_cost_usd = sum of cost_usd.
+- When no keywords are queued or running, set status &quot;Checking groups&quot;.
+- Return the Search.
+
+FIND GROUPS PAGE BEHAVIOUR
+- After &quot;Start search&quot;, call startGroupSearch, then call checkGroupSearch every 20 seconds while the page is open, until status is &quot;Checking groups&quot;, &quot;Done&quot; or &quot;Failed&quot;.
+- Show a progress list: each keyword with a status icon (waiting, searching, done with &quot;N groups&quot;, failed), plus &quot;Spent so far: $X.XX of your Apify credit&quot;.
+- If the status is &quot;Waiting&quot;, show &quot;Your Apify account is busy with other runs. Your search will start automatically.&quot;
+- Show: &quot;This takes about 20–30 minutes. You can leave this page and come back; it carries on where it left off.&quot; When the page is reopened, resume checking.
+- If some keywords failed but others worked, carry on with the groups that were found and say which keywords didn&#x27;t work.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-5" data-target="prompt-5">Copy step 5</button>
+        <button type="button" class="link-btn more" id="more-5" data-target="wrap-5" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-6">
+      <div class="step-top">
+        <span class="label">Step 6 of 12</span>
+        <label class="done" for="done-6"><input type="checkbox" id="done-6" data-step="6"><span>Done</span></label>
+      </div>
+      <h3>Checking and ranking the groups</h3>
+      <p class="desc">Filters out dead, spammy and marketer groups, then picks your top 20.</p>
+      <div class="prompt-wrap" id="wrap-6">
+        <pre class="prompt" id="prompt-6">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+When a Search reaches &quot;Checking groups&quot;, the Find groups page shows &quot;Checking each group…&quot; and runs the check below, then shows a button &quot;See my 20 groups&quot;.
+
+To avoid timeouts, do this in steps from the page, with a progress bar: first the number rules, then the AI check in batches of 15 groups, then the ranking.
+
+STEP A: NUMBER RULES (no AI)
+- Activity bar: 300 or more posts in the last 30 days (an average of 10 a day). Use the 30-day figure, not the 24-hour one. Drop groups below 300 with drop_reason &quot;Under 10 posts a day&quot;.
+- Exception: keep the single most active group whose name contains the user&#x27;s own town AND &quot;mums&quot;, &quot;moms&quot; or &quot;parents&quot;, even if it&#x27;s below the bar. Set why_it_fits to start &quot;Below 10/day, kept as your town&#x27;s main parents group.&quot;
+- Drop any group whose name matches the user&#x27;s groups_to_avoid.
+
+STEP B: AI CHECK, batches of 15 (InvokeLLM with a JSON schema)
+Send the user&#x27;s service, ideal client, not_ideal_client, country, town, region and client_reach, and for each group: id, name, description, rules, members, posts_last_30_days, keyword_type. Give the AI these rules:
+
+- Drop groups for marketers, or run by marketers (&quot;learn marketing strategies with us&quot;). The admin is a competitor.
+- Drop jobs, buy/sell, &quot;for sale&quot;, &quot;free advertising&quot;, &quot;offers&quot;, &quot;directory&quot;, foodie, fan, sports, council and lost-and-found groups. Keep local mums, parents and town chat groups; they&#x27;re a key part of the local list.
+- Drop groups for another country, or a town with the same name elsewhere (Leeds Alabama, Perth Australia, Cambridge Massachusetts, Berkshire County Massachusetts, Bracknell Tasmania).
+- Local means the user&#x27;s town, its county or state, or neighbouring towns within about 30 minutes. Anything further is dropped.
+- Niche groups: if client_reach is &quot;Anywhere in my country&quot;, keep only groups for that country, or clearly mostly from that country. If &quot;Worldwide&quot;, keep English-language groups from anywhere.
+- Drop niche groups that turn out to be for consumers, not business owners (e.g. a foodie group found by &quot;restaurant owners&quot;). Never apply this to mums or community groups.
+- Advertising walls (business and niche groups only, never community groups): drop ONLY if BOTH are true: (1) the description is mostly about advertising and says nothing about advice, support, questions, networking or recommendations, AND (2) posts per day per 1,000 members is over 5 (posts_last_30_days ÷ 30 ÷ (members ÷ 1,000)). If only one is true, keep it and add &quot;Promo-heavy, so check the feed before posting&quot; to why_it_fits.
+- Drop groups you can&#x27;t join (e.g. &quot;qualified practitioners only&quot;, &quot;hairdressers only&quot;) unless the user would qualify.
+- Drop groups whose description or rules ban marketers or service providers (&quot;no marketing help&quot;, &quot;social media experts will be banned&quot;). Facebook&#x27;s standard &quot;No promotions or spam&quot; rule is NOT a ban on marketers; almost every group has it.
+- If the rules ban free-advice posts that could lead to sales, keep the group but set allows_lead_post = false and posting_rules &quot;Comments only, no lead post&quot;.
+- For mums and community groups, note how businesses can take part, e.g. &quot;Business posts on Saturdays only&quot; or &quot;Recommendations thread only&quot;.
+- Keep groups run by a supplier, but note &quot;Run by &lt;supplier&gt;&quot; in why_it_fits.
+- If the rules clearly belong to a different topic (a restaurant group with toy-car rules), ignore them and write &quot;Check on joining&quot;.
+- Classify each kept group&#x27;s type: &quot;Niche&quot;, &quot;Local - business&quot; or &quot;Local - community&quot;.
+
+Return for every group: { id, keep (boolean), drop_reason, type, why_it_fits (one short line), posting_rules, allows_lead_post }. Save the results to each Group.
+
+STEP C: RANK
+- Niche: rank kept Niche groups by posts_last_30_days, highest first, but put allows_lead_post = false groups after the others. Take the top 10.
+- Local: same ranking across Local - business and Local - community together, but aim for roughly 5 business and 5 community. Prefer groups for the user&#x27;s own town over county-wide ones when activity is similar. Take the top 10.
+- Set included = true and rank 1–10 for the chosen groups.
+- If either list has fewer than 10, write the Search summary in plain English, e.g. &quot;Only 6 niche groups reached 10 posts a day. Want me to search more keywords?&quot;, and show a button &quot;Search more keywords&quot; that goes back to keyword suggestions with the existing keywords removed. Never add groups from another country without asking.
+- Set Search status to &quot;Done&quot;.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-6" data-target="prompt-6">Copy step 6</button>
+        <button type="button" class="link-btn more" id="more-6" data-target="wrap-6" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-7">
+      <div class="step-top">
+        <span class="label">Step 7 of 12</span>
+        <label class="done" for="done-7"><input type="checkbox" id="done-7" data-step="7"><span>Done</span></label>
+      </div>
+      <h3>My groups page</h3>
+      <p class="desc">Shows your 20 groups, each with a join button and a status.</p>
+      <div class="prompt-wrap" id="wrap-7">
+        <pre class="prompt" id="prompt-7">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+Build the My groups page showing the included groups from the user&#x27;s latest Done search.
+
+- Two sections: &quot;Niche groups&quot; and &quot;Local groups&quot;, each in rank order.
+- Each group is a card with: name, type badge, members, average posts a day (posts_last_30_days ÷ 30, rounded), why_it_fits, posting_rules, and a status dropdown (Not joined, Requested, Joined, Left, Not a fit) that saves immediately.
+- A &quot;Join group&quot; button on each card that opens the group URL in a new tab.
+- A progress line at the top: &quot;Joined 12 of 20&quot;.
+- A small &quot;Show dropped groups&quot; link that lists dropped groups with their drop_reason, and a &quot;Add back&quot; button on each in case the user disagrees.
+- An &quot;Export to CSV&quot; button with the columns: Type, Rank, Group name, Link, Privacy, Members, Posts last 30 days, Avg posts per day, Why it fits, Posting rules, Status.
+- A note at the top: &quot;Week 1 is for joining. Request to join all 20, fix your Facebook profile headline (who you help and the result you get), and comment helpfully on 3–5 posts a day.&quot;</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-7" data-target="prompt-7">Copy step 7</button>
+        <button type="button" class="link-btn more" id="more-7" data-target="wrap-7" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-8">
+      <div class="step-top">
+        <span class="label">Step 8 of 12</span>
+        <label class="done" for="done-8"><input type="checkbox" id="done-8" data-step="8"><span>Done</span></label>
+      </div>
+      <h3>Templates</h3>
+      <p class="desc">Loads your 6-week posting sequence, ready to edit.</p>
+      <div class="prompt-wrap" id="wrap-8">
+        <pre class="prompt" id="prompt-8">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+Build the Templates page. The sequence can be any length: one card per week, in order, with &quot;Add week&quot;, &quot;Delete&quot; and drag-to-reorder. The sequence length is the number of Template cards.
+
+Each card has: week_number, title, purpose (one line on what the post is for), body (big text box), community_version (optional, for mums and community groups), needs_client_result (yes/no), and when_to_post (optional).
+
+Explain at the top: &quot;Write each template once. Use [square brackets] for anything that changes per user or group. The app writes a slightly different version for each group, so no two groups get the same post.&quot;
+
+If I have no Templates yet, create the six below, replacing [your business] with my business_description from Setup. Add a &quot;Reset to the default sequence&quot; button (with a confirmation) that restores these six.
+
+The six default templates:
+
+WEEK 1
+Title: Introduction, with a soft call to action
+Purpose: Get people to tell you what they&#x27;re struggling with, and quietly let them know what you do.
+needs_client_result: no
+Body:
+I have some free time, so I thought I would pop in to answer any questions anyone might have about [topic, e.g. growing their business on social media]. I spend a lot of time trying to respond to people&#x27;s posts on here, so I thought it would make sense to create one post so I can go through and help everyone in one go. Haha.
+
+So if you&#x27;re struggling, what is it you&#x27;re struggling with most right now? I will help you as best I can. I own a [your business, e.g. social media management agency], so I should have lots of useful advice for you. And if you&#x27;d rather not post it publicly, please feel free to DM me.
+Community version:
+Any business owners in here? 🙋‍♀️ I have some free time, so I thought I would pop in to answer any questions anyone might have about [topic]. I spend a lot of time trying to respond to people&#x27;s posts, so I thought it would make sense to create one post so I can help everyone in one go. Haha.
+
+So if you run a business and you&#x27;re struggling, what is it you&#x27;re struggling with most right now? I will help you as best I can. I own a [your business], so I should have lots of useful advice for you. And please feel free to DM me if you&#x27;d rather not post it publicly.
+When to post: Only on a day when you have 1–2 hours free to reply to every comment.
+
+WEEK 2
+Title: Value: tips for your industry
+Purpose: Show you know their world with useful tips they can use today.
+needs_client_result: no
+Body:
+Quick tip for anyone [ideal client, e.g. running a salon or clinic] 👇
+
+[Tip 1: one common mistake and what to do instead, in 2–3 sentences]
+
+[Tip 2: one simple thing they can do this week, in 1–2 sentences]
+
+Has anyone else found this? Happy to answer any questions below.
+Community version:
+Any business owners in here? 🙋‍♀️ Quick tip that could help 👇 (then the same as the body)
+
+WEEK 3
+Title: Client win
+Purpose: Prove it works with a real result and what you did.
+needs_client_result: yes
+Body:
+Had a lovely win with one of my clients and thought it might help someone in here 🙌
+
+[Client type, e.g. a local salon] went from [x, e.g. 2 enquiries a week] to [y, e.g. 11 a week] in [timeframe]. Here&#x27;s what we did:
+1. [Change 1]
+2. [Change 2]
+3. [Change 3]
+
+Nothing fancy, just [the simple idea behind it]. What&#x27;s the biggest thing holding you back with [topic] at the moment?
+
+WEEK 4
+Title: Re-introduction, a service highlight and value
+Purpose: Re-introduce yourself to new members, show one thing you do, and give away how to do it.
+needs_client_result: no
+Body:
+Hi everyone 👋 There are lots of new faces in here, so I thought I&#x27;d re-introduce myself. I&#x27;m [first name], I own a [your business][, based in town if it&#x27;s a local group] and I help [ideal client] [the result you get them].
+
+One thing I do for every new client is [service highlight, e.g. a content plan built around the questions their customers actually ask]. Here&#x27;s how you can start on it yourself: [2–3 sentences of how-to].
+
+If you&#x27;d like a hand with yours, please feel free to DM me. Either way, I hope that helps!
+
+WEEK 5
+Title: Value: the best way to do X
+Purpose: A how-to on one thing your ideal client wants.
+needs_client_result: no
+Body:
+The best way to [x, e.g. get more enquiries from Instagram] that I&#x27;ve found:
+
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+Save this for later, and if you&#x27;ve got any questions just pop them below 👇
+
+WEEK 6
+Title: Client win (a different one)
+Purpose: A second real result, told a different way from week 3.
+needs_client_result: yes
+Body:
+Before and after 👇
+
+Before: [client type] came to me because [their problem, e.g. posting every day but getting no enquiries].
+After: [result, e.g. 9 booked consultations last month].
+
+What changed: [2–3 short lines on what you did]
+
+If you&#x27;re stuck in the &quot;before&quot; bit right now, what&#x27;s getting in the way?
+
+Add a button &quot;Write my posts&quot; that goes to the Post this week page and generates the posts (next prompt).</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-8" data-target="prompt-8">Copy step 8</button>
+        <button type="button" class="link-btn more" id="more-8" data-target="wrap-8" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-9">
+      <div class="step-top">
+        <span class="label">Step 9 of 12</span>
+        <label class="done" for="done-9"><input type="checkbox" id="done-9" data-step="9"><span>Done</span></label>
+      </div>
+      <h3>Writing the posts</h3>
+      <p class="desc">Writes every week's post for every group, in your voice.</p>
+      <div class="prompt-wrap" id="wrap-9">
+        <pre class="prompt" id="prompt-9">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+Add post generation. When the user presses &quot;Write my posts&quot; (or &quot;Rewrite&quot; on the Post this week page), loop through the included groups ONE AT A TIME from the page, with a progress bar (&quot;Writing posts for group 4 of 20…&quot;), so nothing times out.
+
+ROUNDS: one &quot;round&quot; is one pass through all the Templates (e.g. 6 weeks for a 6-template sequence). Add to the Post entity: round (number) and template_week (number). Change Post.week_number to an absolute week number counted from sequence_start_date (week 7 is round 2&#x27;s first week in a 6-week sequence). &quot;Write my posts&quot; writes the current round. When the last week of a round starts, show a button &quot;Write next round&quot; that writes the next round with fresh wording that doesn&#x27;t repeat the last round&#x27;s posts (send the AI the previous round&#x27;s post for that group and template).
+
+For each group, make ONE InvokeLLM call that returns every template week for that group as JSON: { &quot;posts&quot;: [ { &quot;template_week&quot;: 1, &quot;body&quot;: &quot;...&quot; }, ... ] }. Save each as a Post with status &quot;To post&quot;, the round, and its absolute week_number. If a Post already exists for that group and week and is &quot;Posted&quot;, don&#x27;t overwrite it.
+
+Send the AI: the user&#x27;s Profile (first_name, business_name, business_description, service, ideal_client, client_result, client_result_2, town, spelling), the group (name, type, description, posting_rules, allows_lead_post), and every Template with its title, purpose, body, community_version and needs_client_result.
+
+Writing rules for the AI:
+- Follow the template closely. Keep its structure, its casual, human voice and its emojis, and keep phrases like &quot;Haha&quot; and &quot;please feel free to DM me&quot;. These posts work because they sound like a real person, not a business.
+- Each week&#x27;s post must do the job in its purpose line. Tips and how-tos must be specific to the user&#x27;s service and this group&#x27;s audience, practical, and usable today; no generic advice like &quot;be consistent&quot;.
+- Templates with needs_client_result: use client_result for the first one in the sequence, client_result_2 for the second, and so on, so the same result isn&#x27;t used twice in a round. Never invent a result, number, timeframe or client. If there&#x27;s no real result for that week, keep the template&#x27;s [placeholders] exactly as they are, and set needs_result_filled = true on that Post (add this boolean field).
+- Mentioning what the user does, and inviting DMs, is fine only where the template already does it (weeks 1 and 4 in the default sequence). Never add prices or links.
+- Fill every [placeholder] for this user and this group. For [topic], match the service: ads manager or agency → &quot;growing their business and getting more leads&quot;; social media manager → &quot;social media, and what to post to actually get enquiries&quot;; content creator → &quot;content, and what to film or post to get more customers&quot;; email marketer → &quot;email marketing, and getting past customers to come back&quot;; Google ads or SEO → &quot;showing up on Google when people search for what you do&quot;.
+- For &quot;Local - community&quot; groups, use the template&#x27;s community_version if there is one; otherwise call business owners out first (&quot;Any business owners in here? 🙋‍♀️&quot;).
+- Change the wording slightly for each group, so no two groups get identical posts. Admins and members notice copy-pasted posts. Keep the meaning the same.
+- If allows_lead_post is false, rewrite any &quot;ask me your struggles&quot; post as a single helpful tip ending in a question, and start the body with &quot;(Adjusted: this group doesn&#x27;t allow advice-for-business posts)&quot;.
+- Use the spelling the user chose (UK or US).</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-9" data-target="prompt-9">Copy step 9</button>
+        <button type="button" class="link-btn more" id="more-9" data-target="wrap-9" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-10">
+      <div class="step-top">
+        <span class="label">Step 10 of 12</span>
+        <label class="done" for="done-10"><input type="checkbox" id="done-10" data-step="10"><span>Done</span></label>
+      </div>
+      <h3>Post this week</h3>
+      <p class="desc">Your weekly board with a Copy & open group button on every card.</p>
+      <div class="prompt-wrap" id="wrap-10">
+        <pre class="prompt" id="prompt-10">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+Build the Post this week page.
+
+- One tab per week of the current round (Week 1 to Week 6 for a 6-template sequence), labelled with the template title, e.g. &quot;Week 3: Client win&quot;, and the dates. Open on the current week, worked out from the Profile&#x27;s sequence_start_date (week 1 starts that Monday). Before the start date, open Week 1.
+- Show the template&#x27;s purpose line under the tab, so the user knows what this week&#x27;s post is for.
+- If a Post has needs_result_filled = true, show a callout panel on its card: &quot;Add a real client result before posting&quot;. Make &quot;Copy &amp; open group&quot; ask &quot;This post still has [placeholders]. Post anyway?&quot; if the text still contains [ or ].
+- Show one card per included group, in rank order, but only groups with status &quot;Joined&quot; at the top. Groups not yet joined appear below under &quot;Not joined yet&quot;, greyed out, with a &quot;Join group&quot; button.
+- Each card shows: group name, type badge, posting_rules (shown in a callout panel if it mentions a day, e.g. &quot;Saturdays only&quot;), the post text in an editable box (edits save to the Post), and the status.
+- The main button on each card is &quot;Copy &amp; open group&quot;. When tapped, it must, in the same click handler and without awaiting anything first:
+  1. start copying the post text to the clipboard with navigator.clipboard.writeText,
+  2. immediately call window.open(group url, &quot;_blank&quot;).
+  Doing both straight away inside the tap matters, because phones block pop-ups that open after an await. If the clipboard copy fails, fall back to selecting the text in the box and show &quot;Press and hold to copy&quot;.
+  Then show a toast: &quot;Copied! Tap &#x27;Write something…&#x27; in the group and paste.&quot;
+- On phones, the Facebook link opens the Facebook app if it&#x27;s installed. That&#x27;s fine.
+- A &quot;Mark as posted&quot; button sets status &quot;Posted&quot; and posted_at = now, and marks the card with a black &quot;Posted&quot; tag and a tick. A small &quot;Skip this week&quot; link sets &quot;Skipped&quot;.
+- Progress at the top: &quot;Posted in 7 of 18 joined groups this week&quot;.
+- A &quot;Rewrite&quot; button on each card regenerates just that group&#x27;s post for that week using the same rules as before.
+- Footer reminder: &quot;Post in only one or two groups a day, and only when you&#x27;ve got time to reply to every comment. The replies are where the leads come from. When someone DMs you, reply the same day.&quot;
+
+Never add any feature that posts, comments or messages on Facebook automatically.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-10" data-target="prompt-10">Copy step 10</button>
+        <button type="button" class="link-btn more" id="more-10" data-target="wrap-10" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-11">
+      <div class="step-top">
+        <span class="label">Step 11 of 12</span>
+        <label class="done" for="done-11"><input type="checkbox" id="done-11" data-step="11"><span>Done</span></label>
+      </div>
+      <h3>Tracker</h3>
+      <p class="desc">Logs your leads in two taps and shows what's working.</p>
+      <div class="prompt-wrap" id="wrap-11">
+        <pre class="prompt" id="prompt-11">Use the cream-and-black design system from Prompt 2 for everything in this step.
+
+Build the Tracker page, so the user can see each week how consistent they were, what they posted, how many leads came from it, and where the gaps are.
+
+NEW ENTITY: Lead
+- name (text): the person&#x27;s name
+- business (text, optional)
+- post_id (text): the Post it came from
+- group_id (text): the Group it came from
+- week_number (number): the absolute week
+- source (select: Commented on my post, DM&#x27;d me, Tagged by a friend, Replied to my comment, Other)
+- stage (select: Conversation, Call booked, Proposal sent, Client won, Not a fit). Default &quot;Conversation&quot;.
+- value (number, optional): monthly value if they became a client, shown in the user&#x27;s Profile currency
+- date (date). Default today.
+- notes (long text, optional)
+
+(Post already has comments_count and notes.)
+
+LOGGING (make this quick, it has to take seconds on a phone):
+- On every card on the Post this week page that is &quot;Posted&quot;, add two buttons: &quot;+ Lead&quot; and &quot;Comments: N&quot;.
+  - &quot;+ Lead&quot; opens a small form (name, business, source, notes) with the post, group and week already filled in.
+  - &quot;Comments: N&quot; lets them type the number of comments the post got.
+- Also put a floating &quot;+ Lead&quot; button on the Tracker page, where they pick the group from a list (most recently posted first).
+
+TRACKER PAGE
+1. Week picker at the top (every week so far, labelled with its template title, e.g. &quot;Week 3: Client win&quot;, plus &quot;All weeks&quot;). Default to the current week.
+
+2. This week at a glance (four big number tiles):
+   - Posts: posted ÷ planned, e.g. &quot;14 of 18&quot;, where planned = Posts for that week in groups with status &quot;Joined&quot;
+   - Comments: total comments_count
+   - Leads: number of Lead records
+   - Calls booked and clients won
+
+3. Consistency:
+   - A row of 7 day dots (Mon–Sun) for the selected week, filled on days they marked at least one post as posted. Show &quot;Posted on 4 of 7 days&quot;.
+   - Streak: &quot;3 weeks in a row with every joined group posted in&quot;.
+   - A small bar chart of posts posted per week for every week so far, with the planned number as a faint line.
+
+4. What I posted (table, one row per Post for the selected week):
+   Group, type, date posted, a short preview of the post (tap to read in full), comments, leads, status.
+   Sort by leads, highest first. Rows still &quot;To post&quot; go at the bottom in grey.
+
+5. What&#x27;s working:
+   - Leads by group: the top 5 groups by total leads across all weeks.
+   - Leads by template: leads and comments per post for each template (Introduction, Value tips, Client win, Re-introduction and so on) side by side, across all rounds, so the user can see which type of post works best.
+   - Leads by group type: Niche vs Local - business vs Local - community.
+   - Leads per post: total leads ÷ total posts posted.
+
+6. Gaps to fix (a plain-English list worked out by code, not AI, each with a button that takes the user to the right card):
+   - Groups not posted in this week (still &quot;To post&quot; or &quot;Skipped&quot;).
+   - Groups still &quot;Not joined&quot; or &quot;Requested&quot; more than 7 days after the sequence start date.
+   - Groups posted in 2 or more weeks with 0 comments and 0 leads: &quot;Consider leaving and replacing this group&quot;.
+   - Days with no posts this week.
+   - Posts with comments but no leads logged: &quot;Did any of these turn into a conversation? Log it.&quot;
+   - Leads still at &quot;Conversation&quot; for more than 5 days: &quot;Follow up with &lt;name&gt;&quot;.
+
+7. Weekly review (AI): a button &quot;Review my week&quot; that sends this week&#x27;s numbers, last week&#x27;s numbers and the gaps list to InvokeLLM and shows 3 short, specific suggestions for next week in UK English, e.g. &quot;Your community groups got 4 of your 6 leads; post there on their business days first.&quot; Base it only on the numbers given. Never invent numbers.
+
+8. An &quot;Export to CSV&quot; button for the selected week (one row per post: week, group, type, date posted, post text, comments, leads, calls booked, clients won).
+</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-11" data-target="prompt-11">Copy step 11</button>
+        <button type="button" class="link-btn more" id="more-11" data-target="wrap-11" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+    <article class="step" id="step-12">
+      <div class="step-top">
+        <span class="label">Step 12 of 12</span>
+        <label class="done" for="done-12"><input type="checkbox" id="done-12" data-step="12"><span>Done</span></label>
+      </div>
+      <h3>Final check</h3>
+      <p class="desc">Tests everything on a phone and fixes anything broken.</p>
+      <div class="prompt-wrap" id="wrap-12">
+        <pre class="prompt" id="prompt-12">Test the whole app on a phone-sized screen and fix anything broken:
+- I can complete Setup, get keywords, start a search, leave the page, come back, and see it continue.
+- APIFY_TOKEN never appears in browser code or network responses.
+- &quot;Copy &amp; open group&quot; copies the text and opens the group on iPhone Safari and Android Chrome.
+- Every page has a sensible empty state, e.g. &quot;No groups yet. Find your groups first.&quot;
+- Logging a lead from a posted card takes no more than two taps plus typing a name.
+- Every page follows the design from Prompt 2: cream and black only, black sidebar or bottom bar, Gloock headings never bold, and no other colours, logos, brand names or emoji in the interface.</pre>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn copy" id="copy-12" data-target="prompt-12">Copy step 12</button>
+        <button type="button" class="link-btn more" id="more-12" data-target="wrap-12" aria-expanded="false">Show full prompt</button>
+      </div>
+    </article>
+
+  <div class="card glow">
+    <h2>When it's done</h2>
+    <p class="muted">It doesn't need to be perfect. It needs to be done.</p>
+    <ul>
+      <li>Publish it and save your link.</li>
+      <li>Run your first group search.</li>
+      <li>Join your 20 groups and post your Week 1 post.</li>
+    </ul>
+  </div>
+
+  <div class="card stuck">
+    <h2>Stuck?</h2>
+    <p><strong>Red error?</strong>Copy the exact error text, paste it into the Base44 chat, and approve the fix it offers.</p>
+    <p><strong>Nothing changed?</strong>You were probably in Discuss mode. Switch to Build and send it again.</p>
+    <p><strong>Something stopped with no error?</strong>You may be out of Base44 credits for now. Check your plan page.</p>
+    <p><strong>No groups found?</strong>Check the secret is named exactly <code>APIFY_TOKEN</code> and your Apify account has credit.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var KEY = "sfai-group-engine-done";
+  var toastEl = document.getElementById("toast"), timer;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(timer); timer = setTimeout(function () { toastEl.classList.remove("show"); }, 2400);
+  }
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { return []; } }
+  function save(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} }
+  var done = load();
+
+  document.querySelectorAll(".done input").forEach(function (box) {
+    var n = Number(box.dataset.step);
+    function paint() { document.getElementById("step-" + n).classList.toggle("is-done", box.checked); }
+    box.checked = done.indexOf(n) !== -1; paint();
+    box.addEventListener("change", function () {
+      done = done.filter(function (x) { return x !== n; });
+      if (box.checked) done.push(n);
+      save(done); paint();
+    });
+  });
+
+  function copied(btn) {
+    var label = btn.dataset.label || btn.textContent;
+    btn.dataset.label = label; btn.textContent = "Copied"; btn.classList.add("copied");
+    toast("Copied. Paste it into Base44 and send.");
+    setTimeout(function () { btn.textContent = label; btn.classList.remove("copied"); }, 1800);
+  }
+  function fallback(btn, el) {
+    var range = document.createRange(); range.selectNodeContents(el);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    var ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+    if (ok) { sel.removeAllRanges(); copied(btn); } else { toast("Text selected. Press Ctrl+C or Cmd+C to copy."); }
+  }
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var el = document.getElementById(btn.dataset.target);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(el.textContent).then(function () { copied(btn); }, function () { fallback(btn, el); });
+      } else { fallback(btn, el); }
+    });
+  });
+  document.querySelectorAll(".more").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var open = document.getElementById(btn.dataset.target).classList.toggle("open");
+      btn.textContent = open ? "Show less" : "Show full prompt";
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
